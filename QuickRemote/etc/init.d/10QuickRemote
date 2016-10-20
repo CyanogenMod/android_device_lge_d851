@@ -1,0 +1,25 @@
+#!/system/bin/sh
+
+busybox mount -o remount,rw -t auto /system
+busybox mount -o remount,rw -t auto /data
+
+chmod 666 /dev/ttyHSL1
+
+#try to set target country
+country="$(getprop persist.sys.country)"
+setprop ro.build.target_country $country
+
+#set operator not necessary
+#setprop ro.build.target_operator $operator
+
+setenforce 0
+
+qlog="/sdcard/QRemote.log"
+echo "$(date +"%m-%d-%Y %r" ) Init.d successful, SELinux status is $(getenforce)" >> $qlog
+num="$(wc -l < $qlog)"
+
+if [ "$num" -gt 10 ]; then
+     echo -e "$(sed '1d,2d' $qlog)" > $qlog;
+fi
+
+
